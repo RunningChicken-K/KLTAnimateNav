@@ -114,20 +114,24 @@
 }
 - (NSArray<UIViewController *> *)popToViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
+    
+    NSInteger removeCount = 0;
     for (NSInteger i = self.viewControllers.count - 1; i > 0; i--) {
         if (viewController == self.viewControllers[i]) {
             break;
         }
-
+        
         [_screenshotImgs removeLastObject];
-       
+        removeCount ++;
+        
     }
-    
+    _animationController.removeCount = removeCount;
     return [super popToViewController:viewController animated:animated];
 }
 - (NSArray<UIViewController *> *)popToRootViewControllerAnimated:(BOOL)animated
 {
     [_screenshotImgs removeAllObjects];
+    [_animationController removeAllScreenShot];
     return [super popToRootViewControllerAnimated:animated];
 }
 // 使用上下文截图,并使用指定的区域裁剪,模板代码
