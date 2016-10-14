@@ -31,7 +31,7 @@
     self.delegate = self;
     
     
-        self.navigationBar.tintColor = ColorFromRGB(0x6F7179);
+    self.navigationBar.tintColor = ColorFromRGB(0x6F7179);
     
     self.view.layer.shadowColor = [UIColor blackColor].CGColor;
     self.view.layer.shadowOffset = CGSizeMake(-0.8, 0);
@@ -46,12 +46,12 @@
     _panGestureRec.edges = UIRectEdgeLeft;
     // 为导航控制器的view添加Pan手势识别器
     [self.view addGestureRecognizer:_panGestureRec];
-
+    
     // 2.创建截图的ImageView
     _screenshotImgView = [[UIImageView alloc] init];
     // app的frame是包括了状态栏高度的frame
     _screenshotImgView.frame = CGRectMake(0, 0, ScreenWidth, ScreenHeight);
-
+    
     
     // 3.创建截图上面的黑色半透明遮罩
     _coverView = [[UIView alloc] init];
@@ -71,30 +71,30 @@
 {
     self.animationController.navigationOperation = operation;
     self.animationController.navigationController = self;
-//    self.animationController.lastVCScreenShot = self.lastVCScreenShotImg;
-   // self.animationController.nextVCScreenShot = self.nextVCScreenShotImg;
+    //    self.animationController.lastVCScreenShot = self.lastVCScreenShotImg;
+    // self.animationController.nextVCScreenShot = self.nextVCScreenShotImg;
     return self.animationController;
 }
 - (AnimationContoller *)animationController
 {
     if (_animationController == nil) {
         _animationController = [[AnimationContoller alloc]init];
-      
+        
     }
     return _animationController;
 }
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
-
+    
     
     // 只有在导航控制器里面有子控制器的时候才需要截图
     if (self.viewControllers.count >= 1) {
         // 调用自定义方法,使用上下文截图
         [self screenShot];
     }
-
+    
     [super pushViewController:viewController animated:animated];
-   
+    
     
 }
 - (UIViewController *)popViewControllerAnimated:(BOOL)animated
@@ -104,13 +104,13 @@
     if (index >= 2) {
         className = NSStringFromClass([self.viewControllers[index -2] class]);
     }
-
-    if (_screenshotImgs.count >= index - 1) {
-         [_screenshotImgs removeLastObject];
-    }
-   
     
-   return [super popViewControllerAnimated:animated];
+    if (_screenshotImgs.count >= index - 1) {
+        //[_screenshotImgs removeLastObject];
+    }
+    
+    
+    return [super popViewControllerAnimated:animated];
 }
 - (NSArray<UIViewController *> *)popToViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
@@ -146,7 +146,14 @@
     // 要裁剪的矩形范围
     CGRect rect = CGRectMake(0, 0, ScreenWidth, ScreenHeight);
     //注：iOS7以后renderInContext：由drawViewHierarchyInRect：afterScreenUpdates：替代
-    [beyondVC.view drawViewHierarchyInRect:rect  afterScreenUpdates:NO];
+    //判读是导航栏是否有上层的Tabbar  决定截图的对象
+    if (self.tabBarController == beyondVC) {
+        [beyondVC.view drawViewHierarchyInRect:rect  afterScreenUpdates:NO];
+    }
+    else
+    {
+        [self.view drawViewHierarchyInRect:rect afterScreenUpdates:NO];
+    }
     // 从上下文中,取出UIImage
     UIImage *snapshot = UIGraphicsGetImageFromCurrentImageContext();
     // 添加截取好的图片到图片数组
@@ -154,7 +161,7 @@
         [_screenshotImgs addObject:snapshot];
         //self.lastVCScreenShotImg = snapshot;
     }
-
+    
     
     // 千万记得,结束上下文(移除栈顶的基于当前位图的图形上下文)
     UIGraphicsEndImageContext();
@@ -168,7 +175,7 @@
     
     // 如果当前显示的控制器已经是根控制器了，不需要做任何切换动画,直接返回
     if(self.visibleViewController == self.viewControllers[0]) return;
-
+    
     // 判断pan手势的各个阶段
     switch (panGestureRec.state) {
         case UIGestureRecognizerStateBegan:
@@ -215,12 +222,12 @@
     
     // 得到手指拖动的位移
     CGFloat offsetX = [pan translationInView:self.view].x;
-
+    
     // 让整个view都平移     // 挪动整个导航view
     if (offsetX > 0) {
         self.view.transform = CGAffineTransformMakeTranslation(offsetX, 0);
     }
-
+    
     
     // 计算目前手指拖动位移占屏幕总的宽高的比例,当这个比例达到3/4时, 就让imageview完全显示，遮盖完全消失
     double currentTranslateScaleX = offsetX/self.view.frame.size.width;
@@ -277,8 +284,8 @@
             [self popViewControllerAnimated:NO];
             
             // 重要~记得这时候,可以移除截图数组里面最后一张没用的截图了
-           // [_screenshotImgs removeLastObject];
-                [self.animationController removeLastScreenShot];
+            // [_screenshotImgs removeLastObject];
+            [self.animationController removeLastScreenShot];
         }];
     }
 }
@@ -294,17 +301,17 @@
 //        // 表示用户在根控制器界面，就不需要触发滑动手势，
 //        return NO;
 //    }
-//    
+//
 //    return YES;
 //}
 /*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
 
 @end
