@@ -106,7 +106,7 @@
     }
     
     if (_screenshotImgs.count >= index - 1) {
-        //[_screenshotImgs removeLastObject];
+        [_screenshotImgs removeLastObject];
     }
     
     
