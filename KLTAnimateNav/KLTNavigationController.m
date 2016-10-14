@@ -175,7 +175,8 @@
             // 开始拖拽阶段
             [self dragBegin];
             break;
-            
+        case UIGestureRecognizerStateCancelled:
+        case UIGestureRecognizerStateFailed:
         case UIGestureRecognizerStateEnded:
             // 结束拖拽阶段
             [self dragEnd];
